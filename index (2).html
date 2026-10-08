@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔐 Admin-Centric Messaging</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.box {
+    max-width: 620px;
+    width: 100%;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+.head {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 22px;
+    text-align: center;
+}
+.head h1 { font-size: 1.25em; margin-bottom: 5px; }
+.head p { opacity: 0.9; font-size: 0.8em; }
+.body { padding: 22px; }
+.tabs {
+    display: flex;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+}
+.tab {
+    flex: 1;
+    padding: 12px 4px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    color: #666;
+    font-size: 0.75em;
+    transition: all 0.3s;
+}
+.tab.active {
+    background: white;
+    color: #667eea;
+    border-bottom: 3px solid #667eea;
+}
+.panel { display: none; }
+.panel.active { display: block; }
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.85em;
+}
+textarea, input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    font-family: inherit;
+    transition: border 0.3s;
+}
+textarea:focus, input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+textarea { resize: vertical; min-height: 70px; }
+button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 8px;
+    font-size: 0.92em;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 8px;
+    transition: transform 0.2s;
+}
+button:hover { transform: translateY(-1px); }
+button.sec {
+    background: #e0e0e0;
+    color: #333;
+}
+button.success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+button.danger {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+.hasil-hitung {
+    background: #f8f9fa;
+    border: 2px dashed #667eea;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    line-height: 1.8;
+}
+.hasil-hitung .baris {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dotted #ddd;
+    padding: 4px 0;
+}
+.hasil-hitung .baris:last-child { border-bottom: none; }
+.hasil-hitung .label-hitung {
+    color: #555;
+    font-weight: 600;
+}
+.hasil-hitung .nilai {
+    color: #667eea;
+    font-weight: bold;
+    font-size: 1.05em;
+}
+.hasil-hitung .highlight {
+    background: #fff3cd;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.kunci-box {
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+.kunci-publik {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border: 3px solid #28a745;
+}
+.kunci-privat {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    border: 3px solid #dc3545;
+}
+.kunci-label {
+    font-size: 0.85em;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.kunci-nilai {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    border: 2px solid #333;
+}
+.copy-btn {
+    background: #333;
+    color: white;
+    padding: 8px;
+    font-size: 0.82em;
+    margin-bottom: 0;
+}
+.result {
+    background: #1e1e2e;
+    color: #a6e3a1;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78em;
+    word-break: break-all;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    max-height: 150px;
+    overflow-y: auto;
+}
+.pesan-asli {
+    background: #fff3cd;
+    color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    margin-bottom: 10px;
+    border-left: 4px solid #ffc107;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.info {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.78em;
+    color: #1565c0;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+.warn {
+    background: #fff3cd;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.78em;
+    color: #856404;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+.err {
+    background: #f8d7da;
+    padding: 10px;
+    border-radius: 8px;
+    color: #721c24;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.82em;
+    margin-bottom: 10px;
+}
+.ok {
+    background: #d4edda;
+    padding: 10px;
+    border-radius: 8px;
+    color: #155724;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.82em;
+    margin-bottom: 10px;
+}
+.footer {
+    text-align: center;
+    padding: 12px;
+    color: #999;
+    font-size: 0.72em;
+    border-top: 1px solid #eee;
+}
+.hidden { display: none; }
+.row { display: flex; gap: 8px; }
+.row > div { flex: 1; }
+.small { font-size: 0.72em; color: #888; margin-top: -6px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="box">
+    <div class="head">
+        <h1>🔐 Admin-Centric Messaging</h1>
+        <p>Hybrid RSA + Algoritma Current (Fibonacci-Hexagonal)</p>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('admin')">👑 Admin</div>
+        <div class="tab" onclick="switchTab('anggota')">👤 Anggota</div>
+        <div class="tab" onclick="switchTab('baca')">📥 Baca Pesan</div>
+    </div>
+    
+    <div class="body">
+        <!-- TAB ADMIN -->
+        <div id="panel-admin" class="panel active">
+            <div class="info">
+                <strong>Admin:</strong> Bangkitkan kunci RSA. Kunci publik dibagikan ke anggota,
+                kunci privat disimpan untuk membaca pesan.
+            </div>
+            
+            <label>Bilangan Prima p</label>
+            <input type="number" id="pAdmin" value="41">
+            
+            <label>Bilangan Prima q</label>
+            <input type="number" id="qAdmin" value="43">
+            
+            <button onclick="generateKunciAdmin()">👑 Bangkitkan Kunci Admin</button>
+            
+            <div id="hasilAdmin"></div>
+        </div>
+        
+        <!-- TAB ANGGOTA -->
+        <div id="panel-anggota" class="panel">
+            <div class="info">
+                <strong>Anggota:</strong> Kirim pesan ke admin menggunakan Kunci Publik Admin.
+            </div>
+            
+            <label>👑 Kunci Publik Admin</label>
+            <textarea id="kunciAdmin" placeholder="Paste kunci publik admin... (contoh: 11,1763)" style="min-height: 55px;"></textarea>
+            
+            <label>👤 Nama Kamu</label>
+            <input type="text" id="namaAnggota" placeholder="Contoh: michael">
+            
+            <label>✍️ Pesan untuk Admin</label>
+            <textarea id="pesanAnggota" placeholder="Tulis pesan..."></textarea>
+            
+            <label>🔢 Kunci Current (1-26)</label>
+            <input type="number" id="kunciCurrentAnggota" min="1" max="26" value="7">
+            
+            <button onclick="kirimKeAdmin()">📤 Kirim ke Admin</button>
+            
+            <div id="hasilAnggota"></div>
+        </div>
+        
+        <!-- TAB BACA -->
+        <div id="panel-baca" class="panel">
+            <div class="info">
+                <strong>Baca Pesan:</strong> Masukkan link rahasia + kunci privat untuk membaca.
+            </div>
+            
+            <label>🔗 Link Rahasia</label>
+            <textarea id="linkRahasia" placeholder="Link akan otomatis terisi jika dibuka dari link rahasia..." style="min-height: 55px;"></textarea>
+            
+            <label>🔑 Kunci Privat</label>
+            <textarea id="kunciPrivat" placeholder="Paste kunci privat... (contoh: 611,1763)" style="min-height: 55px;"></textarea>
+            
+            <button onclick="bacaPesan()">🔓 Baca Pesan</button>
+            
+            <div id="hasilBaca"></div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Hybrid Cryptosystem: RSA + Algoritma Current (Fibonacci-Hexagonal)
+    </div>
+</div>
+
+<script>
+// ================= TABEL CURRENT =================
+const T = {
+    'A':101,'B':126,'C':523,'D':358,'E':548,'F':136,'G':121,'H':340,'I':355,
+    'J':890,'K':144,'L':336,'M':577,'N':108,'O':587,'P':976,'Q':184,'R':810,
+    'S':365,'T':460,'U':111,'V':546,'W':562,'X':168,'Y':578,'Z':946
+};
+const R = {};
+for (let k in T) R[T[k]] = k;
+
+function encCurrent(text) {
+    text = text.toUpperCase();
+    const out = [];
+    for (let c of text) {
+        if (T[c]) out.push(T[c]);
+        else if (c === ' ') out.push('SP');
+        else if (c === '\\n') out.push('NL');
+        else out.push('X' + c.charCodeAt(0));
+    }
+    return out;
+}
+
+function decCurrent(tokens) {
+    const out = [];
+    for (let t of tokens) {
+        if (t === 'SP') out.push(' ');
+        else if (t === 'NL') out.push('\\n');
+        else if (String(t).startsWith('X')) out.push(String.fromCharCode(parseInt(String(t).substring(1))));
+        else if (R[parseInt(t)]) out.push(R[parseInt(t)]);
+    }
+    return out.join('');
+}
+
+function geser(tokens, k) {
+    return tokens.map(t => {
+        if (t === 'SP' || t === 'NL') return t;
+        if (String(t).startsWith('X')) return 'X' + ((parseInt(String(t).substring(1)) + k * 13) % 128);
+        return (parseInt(t) + k * 37) % 1000;
+    });
+}
+
+function batalkan(tokens, k) {
+    return tokens.map(t => {
+        if (t === 'SP' || t === 'NL') return t;
+        if (String(t).startsWith('X')) {
+            let v = (parseInt(String(t).substring(1)) - k * 13) % 128;
+            if (v < 0) v += 128;
+            return 'X' + v;
+        }
+        let v = (parseInt(t) - k * 37) % 1000;
+        if (v < 0) v += 1000;
+        return v;
+    });
+}
+
+// ================= RSA =================
+function isPrime(n) {
+    if (n < 2) return false;
+    if (n === 2) return true;
+    if (n % 2 === 0) return false;
+    for (let i = 3; i <= Math.sqrt(n); i += 2) {
+        if (n % i === 0) return false;
+    }
+    return true;
+}
+
+function gcd(a, b) {
+    while (b) { [a, b] = [b, a % b]; }
+    return a;
+}
+
+function modInverse(e, phi) {
+    for (let d = 2; d < phi; d++) {
+        if ((e * d) % phi === 1) return d;
+    }
+    return null;
+}
+
+function modPow(base, exp, mod) {
+    let result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 === 1) result = (result * base) % mod;
+        exp = Math.floor(exp / 2);
+        base = (base * base) % mod;
+    }
+    return result;
+}
+
+function generateRSA(p, q) {
+    if (!isPrime(p) || !isPrime(q)) {
+        throw new Error("p dan q harus bilangan prima!");
+    }
+    if (p === q) {
+        throw new Error("p dan q tidak boleh sama!");
+    }
+    const n = p * q;
+    const phi = (p - 1) * (q - 1);
+    let e = 3;
+    while (e < phi && gcd(e, phi) !== 1) e += 2;
+    const d = modInverse(e, phi);
+    return { e, d, n, phi, p, q };
+}
+
+// ================= ENCODE =================
+function enc64(s) {
+    return btoa(unescape(encodeURIComponent(s)))
+        .replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
+}
+function dec64(s) {
+    let b = s.replace(/-/g,'+').replace(/_/g,'/');
+    while (b.length % 4) b += '=';
+    return decodeURIComponent(escape(atob(b)));
+}
+
+// ================= UI =================
+function switchTab(t) {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    const tabs = ['admin', 'anggota', 'baca'];
+    const idx = tabs.indexOf(t);
+    document.querySelectorAll('.tab')[idx].classList.add('active');
+    document.getElementById('panel-' + t).classList.add('active');
+}
+
+// ================= ADMIN: GENERATE KUNCI =================
+function generateKunciAdmin() {
+    const p = parseInt(document.getElementById('pAdmin').value);
+    const q = parseInt(document.getElementById('qAdmin').value);
+    
+    try {
+        const rsa = generateRSA(p, q);
+        
+        localStorage.setItem('adminPrivat', rsa.d + ',' + rsa.n);
+        localStorage.setItem('adminPublik', rsa.e + ',' + rsa.n);
+        
+        const e_d = rsa.e * rsa.d;
+        const sisa = e_d % rsa.phi;
+        
+        document.getElementById('hasilAdmin').innerHTML = `
+            <div class="ok">✅ Kunci RSA berhasil dibangkitkan!</div>
+            
+            <!-- KUNCI PUBLIK -->
+            <div class="kunci-box kunci-publik">
+                <div class="kunci-label">📢 KUNCI PUBLIK (bagikan ke SEMUA anggota)</div>
+                <div class="kunci-nilai" id="pubAdmin">${rsa.e}, ${rsa.n}</div>
+                <button class="copy-btn" onclick="copyText('pubAdmin')">📋 Copy Kunci Publik</button>
+                <div class="small" style="margin-top:8px;text-align:center;">
+                    Anggota pakai kunci ini untuk enkripsi pesan
+                </div>
+            </div>
+            
+            <!-- KUNCI PRIVAT -->
+            <div class="kunci-box kunci-privat">
+                <div class="kunci-label">🔐 KUNCI PRIVAT (SIMPAN! Jangan dibagikan)</div>
+                <div class="kunci-nilai" id="privAdmin">${rsa.d}, ${rsa.n}</div>
+                <button class="copy-btn" onclick="copyText('privAdmin')">📋 Copy Kunci Privat</button>
+                <div class="small" style="margin-top:8px;text-align:center;">
+                    Admin pakai kunci ini untuk dekripsi pesan
+                </div>
+            </div>
+            
+            <!-- HASIL HITUNGAN -->
+            <div class="hasil-hitung">
+                <div style="text-align:center;font-weight:bold;color:#667eea;margin-bottom:10px;font-size:1.05em;">
+                    📊 HASIL PERHITUNGAN RSA
+                </div>
+                
+                <div class="baris">
+                    <span class="label-hitung">p (prima 1)</span>
+                    <span class="nilai">${rsa.p}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">q (prima 2)</span>
+                    <span class="nilai">${rsa.q}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">n = p × q</span>
+                    <span class="nilai">${rsa.p} × ${rsa.q} = ${rsa.n}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">φ(n) = (p−1)(q−1)</span>
+                    <span class="nilai">${rsa.p-1} × ${rsa.q-1} = ${rsa.phi}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">e (kunci publik)</span>
+                    <span class="nilai highlight">${rsa.e}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">d (kunci privat)</span>
+                    <span class="nilai highlight">${rsa.d}</span>
+                </div>
+                
+                <div style="margin-top:12px;padding-top:10px;border-top:2px solid #667eea;">
+                    <div style="font-weight:bold;color:#667eea;margin-bottom:6px;">
+                        🔍 Verifikasi: e × d ≡ 1 (mod φ(n))
+                    </div>
+                    <div class="baris">
+                        <span class="label-hitung">e × d</span>
+                        <span class="nilai">${rsa.e} × ${rsa.d} = ${e_d}</span>
+                    </div>
+                    <div class="baris">
+                        <span class="label-hitung">${e_d} mod ${rsa.phi}</span>
+                        <span class="nilai">${sisa} ${sisa === 1 ? '✅' : '❌'}</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top:12px;padding-top:10px;border-top:2px solid #667eea;">
+                    <div style="font-weight:bold;color:#667eea;margin-bottom:6px;">
+                        🔢 Cara Menghitung d (manual)
+                    </div>
+                    <div class="small" style="line-height:1.8;color:#555;">
+                        Cari d sehingga:<br>
+                        d × ${rsa.e} ≡ 1 (mod ${rsa.phi})<br>
+                        d × ${rsa.e} = ${rsa.phi} × k + 1<br>
+                        Coba k = 1, 2, 3, ... sampai d bulat:<br>
+                        ${(() => {
+                            let hasil = '';
+                            for (let k = 1; k <= 10; k++) {
+                                const total = rsa.phi * k + 1;
+                                if (total % rsa.e === 0) {
+                                    hasil += `k = ${k} → d = ${total} / ${rsa.e} = <strong>${total / rsa.e}</strong> ✅`;
+                                    break;
+                                } else {
+                                    hasil += `k = ${k} → ${total} / ${rsa.e} = ${(total / rsa.e).toFixed(2)} ❌<br>`;
+                                }
+                            }
+                            return hasil;
+                        })()}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="warn">
+                ⚠️ <strong>PENTING:</strong> Copy dan simpan kunci privat di tempat aman.
+                Kalau hilang, kamu tidak bisa membaca pesan anggota.
+            </div>
+        `;
+    } catch (err) {
+        document.getElementById('hasilAdmin').innerHTML = 
+            '<div class="err">❌ ' + err.message + '</div>';
+    }
+}
+
+// ================= ANGGOTA: KIRIM KE ADMIN =================
+function kirimKeAdmin() {
+    const kunciAdminStr = document.getElementById('kunciAdmin').value.trim();
+    const nama = document.getElementById('namaAnggota').value.trim();
+    const pesan = document.getElementById('pesanAnggota').value.trim();
+    const kunciCurrent = parseInt(document.getElementById('kunciCurrentAnggota').value);
+    
+    if (!kunciAdminStr || !nama || !pesan || !kunciCurrent) {
+        document.getElementById('hasilAnggota').innerHTML = 
+            '<div class="err">❌ Semua field harus diisi!</div>';
+        return;
+    }
+    
+    if (kunciCurrent < 1 || kunciCurrent > 26) {
+        document.getElementById('hasilAnggota').innerHTML = 
+            '<div class="err">❌ Kunci Current harus 1-26!</div>';
+        return;
+    }
+    
+    try {
+        const [e, n] = kunciAdminStr.split(',').map(x => parseInt(x.trim()));
+        if (!e || !n) throw new Error("Format kunci publik admin salah!");
+        if (e >= n) throw new Error("Kunci publik tidak valid!");
+        
+        // 1. Enkripsi pesan dengan Current
+        const tokens = encCurrent(pesan);
+        const geserTokens = geser(tokens, kunciCurrent);
+        const cipherCurrent = geserTokens.join(',');
+        
+        // 2. Enkripsi kunci Current dengan RSA admin
+        const kunciTerenkripsi = modPow(kunciCurrent, e, n);
+        
+        // 3. Paket
+        const paket = nama + '::' + cipherCurrent + '||' + kunciTerenkripsi;
+        const encoded = enc64(paket);
+        
+        // 4. Link
+        const link = window.location.origin + window.location.pathname + '#a=' + encoded;
+        
+        document.getElementById('hasilAnggota').innerHTML = `
+            <div class="ok">✅ Pesan berhasil dienkripsi!</div>
+            
+            <label>🔗 Link untuk Admin</label>
+            <div class="result" id="linkOut">${link}</div>
+            <button class="sec" onclick="copyText('linkOut')">📋 Copy Link</button>
+            
+            <div class="hasil-hitung" style="font-size:0.78em;">
+                <div style="text-align:center;font-weight:bold;color:#667eea;margin-bottom:8px;">
+                    📊 PROSES ENKRIPSI
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Nama pengirim</span>
+                    <span class="nilai">${escapeHtml(nama)}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Plaintext</span>
+                    <span class="nilai">${escapeHtml(pesan)}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Kunci Current</span>
+                    <span class="nilai">${kunciCurrent}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Ciphertext Current</span>
+                    <span class="nilai" style="font-size:0.85em;">${cipherCurrent}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Kunci terenkripsi RSA</span>
+                    <span class="nilai">${kunciTerenkripsi}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Rumus RSA</span>
+                    <span class="nilai">${kunciCurrent}^${e} mod ${n} = ${kunciTerenkripsi}</span>
+                </div>
+            </div>
+            
+            <div class="info">
+                ⚠️ Kirim link ini ke Admin. Hanya Admin yang bisa membaca.
+            </div>
+        `;
+    } catch (err) {
+        document.getElementById('hasilAnggota').innerHTML = 
+            '<div class="err">❌ ' + err.message + '</div>';
+    }
+}
+
+// ================= BACA: DEKRIPSI =================
+function bacaPesan() {
+    const link = document.getElementById('linkRahasia').value.trim();
+    const kunciPrivStr = document.getElementById('kunciPrivat').value.trim();
+    
+    if (!link || !kunciPrivStr) {
+        document.getElementById('hasilBaca').innerHTML = 
+            '<div class="err">❌ Link dan kunci privat harus diisi!</div>';
+        return;
+    }
+    
+    try {
+        let encoded = '';
+        if (link.includes('#a=')) {
+            encoded = link.split('#a=')[1];
+        } else if (link.includes('#r=')) {
+            encoded = link.split('#r=')[1];
+        } else {
+            encoded = link;
+        }
+        
+        const paket = dec64(encoded);
+        let nama = '';
+        let cipherCurrent, kunciTerenkripsi;
+        
+        if (paket.includes('::')) {
+            const [namaBagian, sisa] = paket.split('::');
+            nama = namaBagian;
+            [cipherCurrent, kunciTerenkripsi] = sisa.split('||');
+        } else {
+            [cipherCurrent, kunciTerenkripsi] = paket.split('||');
+        }
+        
+        const [d, n] = kunciPrivStr.split(',').map(x => parseInt(x.trim()));
+        if (!d || !n) throw new Error("Format kunci privat salah! Harus: angka, angka");
+        
+        const kunciCurrent = modPow(parseInt(kunciTerenkripsi), d, n);
+        
+        // Validasi
+        if (kunciCurrent < 1 || kunciCurrent > 26) {
+            document.getElementById('hasilBaca').innerHTML = `
+                <div class="err">
+                    ❌ Kunci Current tidak valid (${kunciCurrent}).<br>
+                    Kemungkinan kunci privat salah.<br>
+                    Pastikan pakai <strong>kunci privat</strong> (d, n), bukan kunci publik.
+                </div>
+            `;
+            return;
+        }
+        
+        const tokens = cipherCurrent.split(',');
+        const tokensAsli = batalkan(tokens, kunciCurrent);
+        const plaintext = decCurrent(tokensAsli);
+        
+        let namaHtml = '';
+        if (nama) {
+            namaHtml = `
+                <div class="baris">
+                    <span class="label-hitung">Dari</span>
+                    <span class="nilai">${escapeHtml(nama)}</span>
+                </div>
+            `;
+        }
+        
+        document.getElementById('hasilBaca').innerHTML = `
+            <div class="ok">✅ Pesan berhasil didekripsi!</div>
+            
+            <div class="hasil-hitung" style="font-size:0.78em;">
+                <div style="text-align:center;font-weight:bold;color:#667eea;margin-bottom:8px;">
+                    📊 PROSES DEKRIPSI
+                </div>
+                ${namaHtml}
+                <div class="baris">
+                    <span class="label-hitung">Kunci terenkripsi RSA</span>
+                    <span class="nilai">${kunciTerenkripsi}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Rumus dekripsi</span>
+                    <span class="nilai">${kunciTerenkripsi}^${d} mod ${n} = ${kunciCurrent}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Kunci Current</span>
+                    <span class="nilai highlight">${kunciCurrent}</span>
+                </div>
+                <div class="baris">
+                    <span class="label-hitung">Ciphertext Current</span>
+                    <span class="nilai" style="font-size:0.85em;">${cipherCurrent}</span>
+                </div>
+            </div>
+            
+            <label>💬 Pesan Asli</label>
+            <div class="pesan-asli">${escapeHtml(plaintext)}</div>
+        `;
+    } catch (err) {
+        document.getElementById('hasilBaca').innerHTML = 
+            '<div class="err">❌ Gagal dekripsi: ' + err.message + '</div>';
+    }
+}
+
+// ================= UTILS =================
+function copyText(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('✅ Berhasil dicopy!');
+    }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('✅ Berhasil dicopy!');
+    });
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ================= AUTO-DETECT =================
+window.addEventListener('load', () => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#a=') || hash.startsWith('#r=')) {
+        switchTab('baca');
+        document.getElementById('linkRahasia').value = window.location.href;
+        document.getElementById('kunciPrivat').focus();
+    }
+});
+</script>
+</body>
+</html>
