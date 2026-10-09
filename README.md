@@ -1,4 +1,4 @@
-[deepseek_html_20261008_e5b6ea.html](https://github.com/user-attachments/files/33227259/deepseek_html_20261008_e5b6ea.html)
+[idex.html](https://github.com/user-attachments/files/33228422/idex.html)
 <!DOCTYPE html>
 <html lang="id">
 <head>
